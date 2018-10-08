@@ -1,0 +1,16 @@
+name: visitoolkit_psc2alm
+channels:
+  - anaconda
+  - conda-forge
+  - defaults
+dependencies:
+  - certifi=2018.8.24=py37_1
+  - pip=10.0.1=py37_0
+  - python=3.7.0=he025d50_0
+  - setuptools=40.2.0=py37_0
+  - vc=14.1=h21ff451_3
+  - vs2015_runtime=15.5.2=3
+  - wheel=0.31.1=py37_0
+  - wincertstore=0.2=py37_0
+prefix: C:\Anaconda3\envs\visitoolkit_psc2alm
+
