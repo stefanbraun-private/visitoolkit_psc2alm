@@ -1,7 +1,6 @@
 name: visitoolkit_psc2alm
 channels:
   - anaconda
-  - conda-forge
   - defaults
 dependencies:
   - certifi=2018.8.24=py37_1
@@ -12,5 +11,17 @@ dependencies:
   - vs2015_runtime=15.5.2=3
   - wheel=0.31.1=py37_0
   - wincertstore=0.2=py37_0
+  - pip:
+    - altgraph==0.16.1
+    - future==0.16.0
+    - macholib==1.11
+    - pefile==2018.8.8
+    - pyinstaller==3.4
+    - python-dateutil==2.7.3
+    - pywin32-ctypes==0.2.0
+    - six==1.11.0
+    - visitoolkit-connector==0.1.1
+    - visitoolkit-eventsystem==0.1.5
+    - websocket-client-py3==0.15.0
 prefix: C:\Anaconda3\envs\visitoolkit_psc2alm
 

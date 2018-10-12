@@ -8,9 +8,12 @@ Stefan Braun / sbraun@datacomm.ch
 ==>to do: sobald Weg gefunden ist, diesen sauber dokumentieren!!!
 
 
-(Entwicklersystem: Win10 Pro x64)
-=>jedoch Anwendungen sollen auch auf Win7 32Bit laufen,
-darum Python 3 x32 (Anaconda3) als Root-Anaconda-Environment
+Anpassung per 10.10.2018: Entwicklersystem: Win7 x86 (32Bit!!!)
+Dies ist der kleinste gemeinsame Nenner der Ziel-Plattformen,
+und gemäss diversen Quellen müssen somit portable EXE-Dateien direkt auf der Zielplattform erstellt werden!
+(PyInstaller: Python-Code wird mitsamt Python-Interpreter und allen notwendigen Python-Modulen zusammengepackt)
+
+=>darum Python 3 x32 (Anaconda3) als Root-Anaconda-Environment
 
 
 1) Installation Anaconda:
@@ -83,13 +86,17 @@ bestehenden Quellcode aus Vorgängerprojekt übernehmen und für Python3 bereinigen
   -Python-Standard Einrückung mittels 4x Space anstelle Tab korrigieren
       ->Notepad++, RegEx Suchen/Ersetzen: "\t"->"    "
 
+	  
 -"Pycharm" -> "Settings" -> "Project: visitoolkit_psc2alm" -> "Interpreter"
   (für Entwicklung benötigt)
   -> Package "visitoolkit-connector" via PyPI installieren (grünes "Conda"-Icon inaktiv, dann "+"),
      zur Vermeidung von Inkompatibilitäten auf bestimmte Version einschränken
-     (komisch: PyPI-Pakete lassen sich bei diesem PyCharm-Projekt nicht anzeigen...?!?
-      =>Abhilfe: "Anaconda Prompt" starten -> "activate visitoolkit_psc2alm", "pip install visitoolkit-connector"
   -> Package "PyInstaller" ebenfalls in Pycharm via PyPI installieren
+  
+  ==>ACHTUNG: manchmal sieht man in PyCharm, in "Anaconda Prompt" und "Anaconda Navigator"
+     jeweils mit den Paketmanagern "Conda" und "pip" unterschiedliche Paketversionen... Grund unbekannt.
+    (falls sich PyPI-Pakete im PyCharm-Projekt nicht anzeigen lassen:
+        "Anaconda Prompt" starten -> "activate visitoolkit_psc2alm", "pip install visitoolkit-connector")	 
 
 
 Für exakte Duplizierung der Entwicklungsumgebung die Version aller genutzten Conda-Packages erfassen:
@@ -102,7 +109,6 @@ Für exakte Duplizierung der Entwicklungsumgebung die Version aller genutzten Con
 
 
 
-# FIXME: Wegen "Nur-Binary-Distribution" muss untenstehende Vorgehensweise überarbeitet werden
 7) Veröffentlichung Projekt:
 
 Vorbereitung: ev. folgende Dateien überarbeiten:
@@ -111,7 +117,10 @@ CHANGES.txt
 LICENSE.txt
 MANIFEST.in	// Inhalt ist mir nicht mehr ganz klar... :-/
 README.md	// in "Pycharm" gibts guten "MarkDown"-Editor! Die gerenderte Ausgabe wird auf GitHub Projektwebseite veröffentlicht
-
+requirements.txt  // inkl. Versionsangaben von Hand pflegen, ergibt in GitHub den "dependency graph"
+                    https://help.github.com/articles/listing-the-packages-that-a-repository-depends-on/
+                    (Imports durchgehen, hier nachsehen: "Pycharm" -> "Settings" -> "Project: visitoolkit_psc2alm" -> "Interpreter",
+                    Teile von "environment.yml" kopieren, Aufbau dieser Datei siehe https://www.jetbrains.com/help/pycharm/managing-dependencies.html )
 
 
 in PyCharm:
@@ -128,52 +137,42 @@ https://pyinstaller.readthedocs.io/en/stable/operating-mode.html#bundling-to-one
 -"Anaconda Prompt" starten
 -conda Environment aktivieren: "activate visitoolkit_psc2alm"
 -in Projektverzeichnis wechseln: "cd C:\Users\Asenta\PycharmProjects\visitoolkit_psc2alm"
--"pyinstaller --onefile visitoolkit_psc2alm\psc2alm.py"
+-"pyinstaller --onefile --name visitoolkit_psc2alm_v0.0.1_x86 visitoolkit_psc2alm\psc2alm.py"
 ==>dies generiert die einzelne EXE-Datei unter "..\dist",
 diese kann auf GitHub als Release hochgeladen werden.
+
+"pyinstaller --onedir --name visitoolkit_psc2alm_v0.0.1_x86 visitoolkit_psc2alm\psc2alm.py"
+  ==>danach dies in ZIP-File packen und im gleichen Zug veröffentlichen
+
+Erklärung zu zweitem Pack-Vorgang:
+=>Python 3.x gepackt mittels PyInstaller läuft nicht unter lange nicht mehr aktualisiertem Windows 7 32Bit,
+es taucht der Fehler "Der Prozedureinstiegspunkt ucrtbase.abort wurde in der DLL
+api-ms-win-crt-runtime-l1-1-0.dll nicht gefunden" auf,
+obwohl genau aus diesem Grund auf Win7 x86 als Entwicklungsumgebung gewechselt wurde....
+
+  =>Workaround: Nicht alles in eine EXE packen, sondern nur in gemeinsames Verzeichnis:
+  (offenbar ist der Entpacker das Problem, nicht der Python-Interpreter...)
+  "pyinstaller --onedir --name visitoolkit_psc2alm_v0.0.1_x86 visitoolkit_psc2alm\psc2alm.py"
+
+  =>Anleitung für Installation der neueren Visual C++ DLLs klappte leider nicht:
+https://appuals.com/how-to-fix-the-procedure-entry-point-ucrtbase-terminate-is-missing-or-could-not-be-located/
+  =>möglicherweise müsste man das betroffene Windows mit Updates versorgen...
+)
+
 
 (zu beachten: auch wenn Python-Scripte in PyCharm fehlerfrei abgearbeitet werden,
 das Zusammenschnüren zu einem EXE-File birgt verschiedene Risiken...
 z.B. nicht aufgelöste Abhängigkeiten,
 oder z.B. falsches Encoding beim Textdatei-Handling im Konsolenprogramm, etc.
 http://python-notes.curiousefficiency.org/en/latest/python3/text_file_processing.html
-)
 
 
-
-==========================================================================================================
-
-Anhang: diverse ausführliche Notizen und Erkenntnisse nach diversen Recherchen... :-/
-**************************************************************************************
-=>PyPI Package erstellen:
--siehe https://the-hitchhikers-guide-to-packaging.readthedocs.io/en/latest/index.html
--PyPI-Projektbeschreibung (PyPI-Webseite des Package) kann aus existierender "README.md" generiert werden:
- https://packaging.python.org/guides/making-a-pypi-friendly-readme/
- (=>README-Datei für GitHub ist in MarkDown *.md formatiert, PyCharm hat internen Editor inkl. Vorschau)
-in PyCharm kann mittels "Tools" direkt setup.py erstellt und "setup.py-Task" aufgerufen werden
-(jedoch fehlt Paket "docutils"...
-somit "Settings"->"Python Interpreter"->"use Conda" / "+" nach diesem Paket suchen und dieses installieren.
-
-=>aktuellere Anleitung:
-https://packaging.python.org/tutorials/packaging-projects/#uploading-your-project-to-pypi
-(somit Paket "twine" installieren mittels PyCharm)
-==>zu beachten: https://anweshadas.in/how-to-upload-a-package-in-pypi-using-twine/
-==>Anleitung: https://pypi.org/project/twine/
-
-==>Twine in Anaconda nutzen
-(SO GEHT ES nachdem man die setup.py-Tasks bis "register" durchgeführt hat;
-neuerdings läuft PyPI mit "Warehouse" und "register"-Kommando vor dem "upload" wird beim neuen pypi.org nicht mehr verwendet!!!):
--"Anaconda Prompt" starten
--conda Environment aktivieren: "activate pyVisiToolkit-eventsystem"
--in Projektverzeichnis wechseln: "cd C:\Users\Asenta\PycharmProjects\pyVisiToolkit-eventsystem"
--hochladen des in ...\dist\. erzeugten Python-Installationspakets: "twine upload dist\*"
-(Ziel ist defaultmässig PyPI.org, twine fragt dann nach PyPI-Benutzer/Passwort)
-=>Paket ist dann unter https://pypi.org/project/pyVisiToolkit-eventsystem
+-vor Veröffentlichung:
+  -Testlauf der Anwendung.
+   (Sie könnte sich ausserhalb von PyCharm und/oder mit PyInstaller gepackt anders verhalten, z.B. fehlende Dateien)
+  -leider sporadisch Antivirus-Fehlalarme aufgrund Heuristik,
+   da kann man nicht viel machen... (Prüfung mittels https://www.virustotal.com sollte nicht zu viele Treffer ergeben)
+   =>Abhilfe 1): erzeugte EXE im Antivirenprogramm zu den Ausnahmen hinzufügen
+   =>Abhilfe 2): Beim Hersteller des EIGENEN Antivirenprogrammes erzeugte EXE als "false positive" melden
 
 
-to do:
-lesen: https://datascience.stackexchange.com/questions/24093/how-to-clone-python-working-environment-on-another-machine
-lesen: http://python-packaging.readthedocs.io/en/latest/minimal.html
-lesen: http://docs.python-guide.org/en/latest/writing/structure/
-lesen: https://legacy.python.org/dev/peps/pep-0423/
-Umstrukturieren: https://github.com/stefanbraun-private/pyVisiToolkit.git
