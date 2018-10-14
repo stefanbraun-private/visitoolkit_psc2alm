@@ -2,6 +2,9 @@
 Mapping tool for setting PSC reference in AlarmViewer to the best-matching image containing the BMO-instance.  
 Then user can directly open PSC image where error situation is shown.   
 
+![screenshot_visitoolkit_psc2alm.png](https://stefanbraun-private.github.io/img/screenshot_visitoolkit_psc2alm.png)
+
+
 ## about PSC-to-ALM-Mapper
 An INOFFICIAL OpenSource application written in Python 3.  
 
